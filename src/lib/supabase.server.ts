@@ -24,27 +24,21 @@ function getSupabaseAdmin() {
 export { getSupabaseAdmin };
 
 export const STORAGE_BUCKET = "shares";
-export const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
-export const SHARE_TTL_MS = 30 * 60 * 1000; // 30 min
-export const INACTIVE_AFTER_MS = 60 * 1000; // 60 s
 export const SIGNED_URL_TTL_S = 60;
 
+// Allow-list relaxed: accept everything except executables, which storage
+// blocks anyway. Per-share size enforced from app_config.
 export const ALLOWED_MIME_PREFIXES = [
   "text/",
   "image/",
   "video/",
   "audio/",
+  "application/",
+  "font/",
+  "model/",
 ];
-export const ALLOWED_MIME_EXACT = new Set([
-  "application/pdf",
-  "application/zip",
-  "application/x-zip-compressed",
-  "application/octet-stream",
-  "application/json",
-]);
 
 export function isMimeAllowed(mime: string): boolean {
-  if (!mime) return true; // generic
-  if (ALLOWED_MIME_EXACT.has(mime)) return true;
+  if (!mime) return true;
   return ALLOWED_MIME_PREFIXES.some((p) => mime.startsWith(p));
 }

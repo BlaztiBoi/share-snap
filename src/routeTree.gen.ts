@@ -9,7 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SendRouteImport } from './routes/send'
+import { Route as ReceiveRouteImport } from './routes/receive'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ReceiveCodeRouteImport } from './routes/receive.$code'
 import { Route as ApiPublicSharesCreateRouteImport } from './routes/api/public/shares.create'
 import { Route as ApiPublicSharesCodeRouteImport } from './routes/api/public/shares.$code'
 import { Route as ApiPublicDownloadCodeRouteImport } from './routes/api/public/download.$code'
@@ -18,10 +21,25 @@ import { Route as ApiPublicConsumeCodeRouteImport } from './routes/api/public/co
 import { Route as ApiPublicSharesCodeHeartbeatRouteImport } from './routes/api/public/shares.$code.heartbeat'
 import { Route as ApiPublicSharesCodeDeactivateRouteImport } from './routes/api/public/shares.$code.deactivate'
 
+const SendRoute = SendRouteImport.update({
+  id: '/send',
+  path: '/send',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReceiveRoute = ReceiveRouteImport.update({
+  id: '/receive',
+  path: '/receive',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ReceiveCodeRoute = ReceiveCodeRouteImport.update({
+  id: '/$code',
+  path: '/$code',
+  getParentRoute: () => ReceiveRoute,
 } as any)
 const ApiPublicSharesCreateRoute = ApiPublicSharesCreateRouteImport.update({
   id: '/api/public/shares/create',
@@ -63,6 +81,9 @@ const ApiPublicSharesCodeDeactivateRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/receive': typeof ReceiveRouteWithChildren
+  '/send': typeof SendRoute
+  '/receive/$code': typeof ReceiveCodeRoute
   '/api/public/consume/$code': typeof ApiPublicConsumeCodeRoute
   '/api/public/cron/cleanup': typeof ApiPublicCronCleanupRoute
   '/api/public/download/$code': typeof ApiPublicDownloadCodeRoute
@@ -73,6 +94,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/receive': typeof ReceiveRouteWithChildren
+  '/send': typeof SendRoute
+  '/receive/$code': typeof ReceiveCodeRoute
   '/api/public/consume/$code': typeof ApiPublicConsumeCodeRoute
   '/api/public/cron/cleanup': typeof ApiPublicCronCleanupRoute
   '/api/public/download/$code': typeof ApiPublicDownloadCodeRoute
@@ -84,6 +108,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/receive': typeof ReceiveRouteWithChildren
+  '/send': typeof SendRoute
+  '/receive/$code': typeof ReceiveCodeRoute
   '/api/public/consume/$code': typeof ApiPublicConsumeCodeRoute
   '/api/public/cron/cleanup': typeof ApiPublicCronCleanupRoute
   '/api/public/download/$code': typeof ApiPublicDownloadCodeRoute
@@ -96,6 +123,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/receive'
+    | '/send'
+    | '/receive/$code'
     | '/api/public/consume/$code'
     | '/api/public/cron/cleanup'
     | '/api/public/download/$code'
@@ -106,6 +136,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/receive'
+    | '/send'
+    | '/receive/$code'
     | '/api/public/consume/$code'
     | '/api/public/cron/cleanup'
     | '/api/public/download/$code'
@@ -116,6 +149,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/receive'
+    | '/send'
+    | '/receive/$code'
     | '/api/public/consume/$code'
     | '/api/public/cron/cleanup'
     | '/api/public/download/$code'
@@ -127,6 +163,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ReceiveRoute: typeof ReceiveRouteWithChildren
+  SendRoute: typeof SendRoute
   ApiPublicConsumeCodeRoute: typeof ApiPublicConsumeCodeRoute
   ApiPublicCronCleanupRoute: typeof ApiPublicCronCleanupRoute
   ApiPublicDownloadCodeRoute: typeof ApiPublicDownloadCodeRoute
@@ -136,12 +174,33 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/send': {
+      id: '/send'
+      path: '/send'
+      fullPath: '/send'
+      preLoaderRoute: typeof SendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/receive': {
+      id: '/receive'
+      path: '/receive'
+      fullPath: '/receive'
+      preLoaderRoute: typeof ReceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/receive/$code': {
+      id: '/receive/$code'
+      path: '/$code'
+      fullPath: '/receive/$code'
+      preLoaderRoute: typeof ReceiveCodeRouteImport
+      parentRoute: typeof ReceiveRoute
     }
     '/api/public/shares/create': {
       id: '/api/public/shares/create'
@@ -195,6 +254,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ReceiveRouteChildren {
+  ReceiveCodeRoute: typeof ReceiveCodeRoute
+}
+
+const ReceiveRouteChildren: ReceiveRouteChildren = {
+  ReceiveCodeRoute: ReceiveCodeRoute,
+}
+
+const ReceiveRouteWithChildren =
+  ReceiveRoute._addFileChildren(ReceiveRouteChildren)
+
 interface ApiPublicSharesCodeRouteChildren {
   ApiPublicSharesCodeDeactivateRoute: typeof ApiPublicSharesCodeDeactivateRoute
   ApiPublicSharesCodeHeartbeatRoute: typeof ApiPublicSharesCodeHeartbeatRoute
@@ -210,6 +280,8 @@ const ApiPublicSharesCodeRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ReceiveRoute: ReceiveRouteWithChildren,
+  SendRoute: SendRoute,
   ApiPublicConsumeCodeRoute: ApiPublicConsumeCodeRoute,
   ApiPublicCronCleanupRoute: ApiPublicCronCleanupRoute,
   ApiPublicDownloadCodeRoute: ApiPublicDownloadCodeRoute,
@@ -219,3 +291,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   cleanupExpired,
-  deleteShare,
+  deleteShareById,
   getShareByCode,
   signedDownloadUrl,
 } from "@/lib/shares.server";
@@ -9,7 +9,7 @@ import {
 export const Route = createFileRoute("/api/public/download/$code")({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ params, request }) => {
         const code = params.code;
         if (!/^\d{4}$/.test(code)) {
           return json(400, { error: "Invalid code" });
@@ -19,23 +19,38 @@ export const Route = createFileRoute("/api/public/download/$code")({
         if (result.state !== "ok") {
           return json(410, { error: "Share unavailable" });
         }
-        const { share } = result;
-        if (share.kind !== "file" || !share.file_path) {
+        const { share, files } = result;
+        if (share.kind !== "file" || files.length === 0) {
           return json(400, { error: "Not a file share" });
         }
 
-        const url = await signedDownloadUrl(share.file_path);
+        const url = new URL(request.url);
+        const idxParam = url.searchParams.get("index");
+        const fileId = url.searchParams.get("fileId");
 
-        if (share.one_time) {
-          // Best-effort: delete after issuing URL
-          deleteShare(share.id, share.file_path).catch(() => {});
+        let target = files[0];
+        if (fileId) {
+          const found = files.find((f) => f.id === fileId);
+          if (!found) return json(404, { error: "File not found" });
+          target = found;
+        } else if (idxParam) {
+          const i = parseInt(idxParam, 10);
+          if (Number.isNaN(i) || i < 0 || i >= files.length) {
+            return json(400, { error: "Invalid index" });
+          }
+          target = files[i];
         }
 
+        const signed = await signedDownloadUrl(target.path);
+
+        // Only consume on one-time when ALL files have been requested.
+        // Receiver fires deleteAfterAll explicitly when last file downloaded.
+
         return Response.json({
-          url,
-          fileName: share.file_name,
-          fileSize: share.file_size,
-          mimeType: share.mime_type,
+          url: signed,
+          fileName: target.name,
+          fileSize: target.size,
+          mimeType: target.mime_type,
         });
       },
     },

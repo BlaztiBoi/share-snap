@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SendRouteImport } from './routes/send'
 import { Route as ReceiveRouteImport } from './routes/receive'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReceiveCodeRouteImport } from './routes/receive_.$code'
 import { Route as ApiPublicSharesCreateRouteImport } from './routes/api/public/shares.create'
@@ -18,6 +19,9 @@ import { Route as ApiPublicSharesCodeRouteImport } from './routes/api/public/sha
 import { Route as ApiPublicDownloadCodeRouteImport } from './routes/api/public/download.$code'
 import { Route as ApiPublicCronCleanupRouteImport } from './routes/api/public/cron.cleanup'
 import { Route as ApiPublicConsumeCodeRouteImport } from './routes/api/public/consume.$code'
+import { Route as ApiPublicAdminSharesRouteImport } from './routes/api/public/admin.shares'
+import { Route as ApiPublicAdminLoginRouteImport } from './routes/api/public/admin.login'
+import { Route as ApiPublicAdminConfigRouteImport } from './routes/api/public/admin.config'
 import { Route as ApiPublicSharesCodeHeartbeatRouteImport } from './routes/api/public/shares.$code.heartbeat'
 import { Route as ApiPublicSharesCodeDeactivateRouteImport } from './routes/api/public/shares.$code.deactivate'
 
@@ -29,6 +33,11 @@ const SendRoute = SendRouteImport.update({
 const ReceiveRoute = ReceiveRouteImport.update({
   id: '/receive',
   path: '/receive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -66,6 +75,21 @@ const ApiPublicConsumeCodeRoute = ApiPublicConsumeCodeRouteImport.update({
   path: '/api/public/consume/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAdminSharesRoute = ApiPublicAdminSharesRouteImport.update({
+  id: '/api/public/admin/shares',
+  path: '/api/public/admin/shares',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAdminLoginRoute = ApiPublicAdminLoginRouteImport.update({
+  id: '/api/public/admin/login',
+  path: '/api/public/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAdminConfigRoute = ApiPublicAdminConfigRouteImport.update({
+  id: '/api/public/admin/config',
+  path: '/api/public/admin/config',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSharesCodeHeartbeatRoute =
   ApiPublicSharesCodeHeartbeatRouteImport.update({
     id: '/heartbeat',
@@ -81,9 +105,13 @@ const ApiPublicSharesCodeDeactivateRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/receive': typeof ReceiveRoute
   '/send': typeof SendRoute
   '/receive/$code': typeof ReceiveCodeRoute
+  '/api/public/admin/config': typeof ApiPublicAdminConfigRoute
+  '/api/public/admin/login': typeof ApiPublicAdminLoginRoute
+  '/api/public/admin/shares': typeof ApiPublicAdminSharesRoute
   '/api/public/consume/$code': typeof ApiPublicConsumeCodeRoute
   '/api/public/cron/cleanup': typeof ApiPublicCronCleanupRoute
   '/api/public/download/$code': typeof ApiPublicDownloadCodeRoute
@@ -94,9 +122,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/receive': typeof ReceiveRoute
   '/send': typeof SendRoute
   '/receive/$code': typeof ReceiveCodeRoute
+  '/api/public/admin/config': typeof ApiPublicAdminConfigRoute
+  '/api/public/admin/login': typeof ApiPublicAdminLoginRoute
+  '/api/public/admin/shares': typeof ApiPublicAdminSharesRoute
   '/api/public/consume/$code': typeof ApiPublicConsumeCodeRoute
   '/api/public/cron/cleanup': typeof ApiPublicCronCleanupRoute
   '/api/public/download/$code': typeof ApiPublicDownloadCodeRoute
@@ -108,9 +140,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/receive': typeof ReceiveRoute
   '/send': typeof SendRoute
   '/receive_/$code': typeof ReceiveCodeRoute
+  '/api/public/admin/config': typeof ApiPublicAdminConfigRoute
+  '/api/public/admin/login': typeof ApiPublicAdminLoginRoute
+  '/api/public/admin/shares': typeof ApiPublicAdminSharesRoute
   '/api/public/consume/$code': typeof ApiPublicConsumeCodeRoute
   '/api/public/cron/cleanup': typeof ApiPublicCronCleanupRoute
   '/api/public/download/$code': typeof ApiPublicDownloadCodeRoute
@@ -123,9 +159,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/receive'
     | '/send'
     | '/receive/$code'
+    | '/api/public/admin/config'
+    | '/api/public/admin/login'
+    | '/api/public/admin/shares'
     | '/api/public/consume/$code'
     | '/api/public/cron/cleanup'
     | '/api/public/download/$code'
@@ -136,9 +176,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/receive'
     | '/send'
     | '/receive/$code'
+    | '/api/public/admin/config'
+    | '/api/public/admin/login'
+    | '/api/public/admin/shares'
     | '/api/public/consume/$code'
     | '/api/public/cron/cleanup'
     | '/api/public/download/$code'
@@ -149,9 +193,13 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/receive'
     | '/send'
     | '/receive_/$code'
+    | '/api/public/admin/config'
+    | '/api/public/admin/login'
+    | '/api/public/admin/shares'
     | '/api/public/consume/$code'
     | '/api/public/cron/cleanup'
     | '/api/public/download/$code'
@@ -163,9 +211,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   ReceiveRoute: typeof ReceiveRoute
   SendRoute: typeof SendRoute
   ReceiveCodeRoute: typeof ReceiveCodeRoute
+  ApiPublicAdminConfigRoute: typeof ApiPublicAdminConfigRoute
+  ApiPublicAdminLoginRoute: typeof ApiPublicAdminLoginRoute
+  ApiPublicAdminSharesRoute: typeof ApiPublicAdminSharesRoute
   ApiPublicConsumeCodeRoute: typeof ApiPublicConsumeCodeRoute
   ApiPublicCronCleanupRoute: typeof ApiPublicCronCleanupRoute
   ApiPublicDownloadCodeRoute: typeof ApiPublicDownloadCodeRoute
@@ -187,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/receive'
       fullPath: '/receive'
       preLoaderRoute: typeof ReceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -238,6 +297,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicConsumeCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin/shares': {
+      id: '/api/public/admin/shares'
+      path: '/api/public/admin/shares'
+      fullPath: '/api/public/admin/shares'
+      preLoaderRoute: typeof ApiPublicAdminSharesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/login': {
+      id: '/api/public/admin/login'
+      path: '/api/public/admin/login'
+      fullPath: '/api/public/admin/login'
+      preLoaderRoute: typeof ApiPublicAdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/config': {
+      id: '/api/public/admin/config'
+      path: '/api/public/admin/config'
+      fullPath: '/api/public/admin/config'
+      preLoaderRoute: typeof ApiPublicAdminConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/shares/$code/heartbeat': {
       id: '/api/public/shares/$code/heartbeat'
       path: '/heartbeat'
@@ -270,9 +350,13 @@ const ApiPublicSharesCodeRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   ReceiveRoute: ReceiveRoute,
   SendRoute: SendRoute,
   ReceiveCodeRoute: ReceiveCodeRoute,
+  ApiPublicAdminConfigRoute: ApiPublicAdminConfigRoute,
+  ApiPublicAdminLoginRoute: ApiPublicAdminLoginRoute,
+  ApiPublicAdminSharesRoute: ApiPublicAdminSharesRoute,
   ApiPublicConsumeCodeRoute: ApiPublicConsumeCodeRoute,
   ApiPublicCronCleanupRoute: ApiPublicCronCleanupRoute,
   ApiPublicDownloadCodeRoute: ApiPublicDownloadCodeRoute,
@@ -282,13 +366,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

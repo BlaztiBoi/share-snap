@@ -22,13 +22,16 @@ export const Route = createFileRoute("/api/public/shares/$code")({
           return json(410, { error: "Sender is no longer connected" });
         }
 
-        const { share } = result;
+        const { share, files } = result;
         return Response.json({
           kind: share.kind,
           text: share.kind === "text" ? share.text_content : null,
-          fileName: share.file_name,
-          fileSize: share.file_size,
-          mimeType: share.mime_type,
+          files: files.map((f) => ({
+            id: f.id,
+            name: f.name,
+            size: f.size,
+            mimeType: f.mime_type,
+          })),
           oneTime: share.one_time,
           expiresAt: share.expires_at,
         });

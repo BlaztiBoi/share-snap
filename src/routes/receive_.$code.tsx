@@ -15,12 +15,17 @@ export const Route = createFileRoute("/receive_/$code")({
   component: ReceiveCodePage,
 });
 
+type ShareFileInfo = {
+  id: string;
+  name: string;
+  size: number;
+  mimeType: string | null;
+};
+
 type ShareInfo = {
   kind: "text" | "file";
   text: string | null;
-  fileName: string | null;
-  fileSize: number | null;
-  mimeType: string | null;
+  files: ShareFileInfo[];
   oneTime: boolean;
   expiresAt: string;
 };
@@ -32,7 +37,8 @@ function ReceiveCodePage() {
     | { type: "error"; message: string }
     | { type: "ok"; share: ShareInfo }
   >({ type: "loading" });
-  const [downloading, setDownloading] = useState(false);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [consumedIds, setConsumedIds] = useState<Set<string>>(new Set());
   const [consumed, setConsumed] = useState(false);
 
   useEffect(() => {
@@ -56,7 +62,6 @@ function ReceiveCodePage() {
     };
 
     fetchShare();
-    // Poll every 5s while watching the receiver page (detects expiry / sender exit)
     interval = setInterval(() => {
       if (!consumed) fetchShare();
     }, 5000);
@@ -82,7 +87,9 @@ function ReceiveCodePage() {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
         <div className="glass rounded-2xl p-8">
-          <h1 className="text-2xl font-bold">Code {code}</h1>
+          <h1 className="text-2xl font-bold">
+            Code <span className="font-mono neon-text">{code}</span>
+          </h1>
           <p className="mt-3 text-sm text-destructive">{state.message}</p>
           <p className="mt-2 text-xs text-muted-foreground">
             The share may have expired, been downloaded already, or the sender
@@ -101,27 +108,36 @@ function ReceiveCodePage() {
 
   const { share } = state;
 
-  const handleDownload = async () => {
-    setDownloading(true);
+  const downloadFile = async (file: ShareFileInfo) => {
+    setDownloadingId(file.id);
     try {
-      const res = await fetch(`/api/public/download/${code}`);
+      const res = await fetch(
+        `/api/public/download/${code}?fileId=${encodeURIComponent(file.id)}`,
+      );
       const data = await res.json();
       if (!res.ok) {
         toast.error(data.error ?? "Download failed");
         return;
       }
-      // Trigger download
       const a = document.createElement("a");
       a.href = data.url;
-      a.download = data.fileName ?? "download";
+      a.download = data.fileName ?? file.name;
       document.body.appendChild(a);
       a.click();
       a.remove();
-      if (share.oneTime) setConsumed(true);
+      const next = new Set(consumedIds);
+      next.add(file.id);
+      setConsumedIds(next);
+      if (share.oneTime && next.size >= share.files.length) {
+        await fetch(`/api/public/consume/${code}`, { method: "POST" }).catch(
+          () => {},
+        );
+        setConsumed(true);
+      }
     } catch {
       toast.error("Network error");
     } finally {
-      setDownloading(false);
+      setDownloadingId(null);
     }
   };
 
@@ -137,7 +153,7 @@ function ReceiveCodePage() {
       <div className="glass rounded-2xl p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">
+            <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
               Code
             </p>
             <p className="font-mono text-2xl font-bold neon-text">{code}</p>
@@ -162,36 +178,41 @@ function ReceiveCodePage() {
               </div>
             </div>
           ) : (
-            <div className="rounded-lg border border-border bg-background/60 p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 neon-border">
-                  <FileIcon className="h-6 w-6 text-neon" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{share.fileName}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {share.fileSize ? formatBytes(share.fileSize) : ""}
-                    {share.mimeType ? ` · ${share.mimeType}` : ""}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleDownload}
-                disabled={downloading || consumed}
-                className="mt-5 inline-flex w-full items-center justify-center gap-2 neon-button rounded-md px-5 py-3 text-sm font-semibold disabled:opacity-50"
-              >
-                {downloading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Download className="h-4 w-4" />
-                )}
-                {consumed
-                  ? "Downloaded"
-                  : downloading
-                    ? "Preparing…"
-                    : "Download file"}
-              </button>
+            <div className="space-y-2">
+              {share.files.map((f) => {
+                const done = consumedIds.has(f.id);
+                const busy = downloadingId === f.id;
+                return (
+                  <div
+                    key={f.id}
+                    className="flex items-center gap-3 rounded-lg border border-border bg-background/50 p-4"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 neon-border shrink-0">
+                      <FileIcon className="h-5 w-5 text-neon" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-sm">{f.name}</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {formatBytes(f.size)}
+                        {f.mimeType ? ` · ${f.mimeType}` : ""}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => downloadFile(f)}
+                      disabled={busy || (share.oneTime && done)}
+                      className="inline-flex items-center gap-2 neon-button rounded-md px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                    >
+                      {busy ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Download className="h-3.5 w-3.5" />
+                      )}
+                      {done ? "Got it" : busy ? "…" : "Download"}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

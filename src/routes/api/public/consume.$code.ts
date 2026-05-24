@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { deleteShare, getShareByCode } from "@/lib/shares.server";
+import { deleteShareByCode, getShareByCode } from "@/lib/shares.server";
 
 export const Route = createFileRoute("/api/public/consume/$code")({
   server: {
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/api/public/consume/$code")({
         }
         const result = await getShareByCode(code);
         if (result.state === "ok" && result.share.one_time) {
-          await deleteShare(result.share.id, result.share.file_path);
+          await deleteShareByCode(code);
         }
         return new Response("ok");
       },

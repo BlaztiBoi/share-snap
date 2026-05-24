@@ -10,33 +10,128 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicSharesCreateRouteImport } from './routes/api/public/shares.create'
+import { Route as ApiPublicSharesCodeRouteImport } from './routes/api/public/shares.$code'
+import { Route as ApiPublicDownloadCodeRouteImport } from './routes/api/public/download.$code'
+import { Route as ApiPublicCronCleanupRouteImport } from './routes/api/public/cron.cleanup'
+import { Route as ApiPublicConsumeCodeRouteImport } from './routes/api/public/consume.$code'
+import { Route as ApiPublicSharesCodeHeartbeatRouteImport } from './routes/api/public/shares.$code.heartbeat'
+import { Route as ApiPublicSharesCodeDeactivateRouteImport } from './routes/api/public/shares.$code.deactivate'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSharesCreateRoute = ApiPublicSharesCreateRouteImport.update({
+  id: '/api/public/shares/create',
+  path: '/api/public/shares/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSharesCodeRoute = ApiPublicSharesCodeRouteImport.update({
+  id: '/api/public/shares/$code',
+  path: '/api/public/shares/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicDownloadCodeRoute = ApiPublicDownloadCodeRouteImport.update({
+  id: '/api/public/download/$code',
+  path: '/api/public/download/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCronCleanupRoute = ApiPublicCronCleanupRouteImport.update({
+  id: '/api/public/cron/cleanup',
+  path: '/api/public/cron/cleanup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicConsumeCodeRoute = ApiPublicConsumeCodeRouteImport.update({
+  id: '/api/public/consume/$code',
+  path: '/api/public/consume/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSharesCodeHeartbeatRoute =
+  ApiPublicSharesCodeHeartbeatRouteImport.update({
+    id: '/heartbeat',
+    path: '/heartbeat',
+    getParentRoute: () => ApiPublicSharesCodeRoute,
+  } as any)
+const ApiPublicSharesCodeDeactivateRoute =
+  ApiPublicSharesCodeDeactivateRouteImport.update({
+    id: '/deactivate',
+    path: '/deactivate',
+    getParentRoute: () => ApiPublicSharesCodeRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/consume/$code': typeof ApiPublicConsumeCodeRoute
+  '/api/public/cron/cleanup': typeof ApiPublicCronCleanupRoute
+  '/api/public/download/$code': typeof ApiPublicDownloadCodeRoute
+  '/api/public/shares/$code': typeof ApiPublicSharesCodeRouteWithChildren
+  '/api/public/shares/create': typeof ApiPublicSharesCreateRoute
+  '/api/public/shares/$code/deactivate': typeof ApiPublicSharesCodeDeactivateRoute
+  '/api/public/shares/$code/heartbeat': typeof ApiPublicSharesCodeHeartbeatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/consume/$code': typeof ApiPublicConsumeCodeRoute
+  '/api/public/cron/cleanup': typeof ApiPublicCronCleanupRoute
+  '/api/public/download/$code': typeof ApiPublicDownloadCodeRoute
+  '/api/public/shares/$code': typeof ApiPublicSharesCodeRouteWithChildren
+  '/api/public/shares/create': typeof ApiPublicSharesCreateRoute
+  '/api/public/shares/$code/deactivate': typeof ApiPublicSharesCodeDeactivateRoute
+  '/api/public/shares/$code/heartbeat': typeof ApiPublicSharesCodeHeartbeatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/consume/$code': typeof ApiPublicConsumeCodeRoute
+  '/api/public/cron/cleanup': typeof ApiPublicCronCleanupRoute
+  '/api/public/download/$code': typeof ApiPublicDownloadCodeRoute
+  '/api/public/shares/$code': typeof ApiPublicSharesCodeRouteWithChildren
+  '/api/public/shares/create': typeof ApiPublicSharesCreateRoute
+  '/api/public/shares/$code/deactivate': typeof ApiPublicSharesCodeDeactivateRoute
+  '/api/public/shares/$code/heartbeat': typeof ApiPublicSharesCodeHeartbeatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/api/public/consume/$code'
+    | '/api/public/cron/cleanup'
+    | '/api/public/download/$code'
+    | '/api/public/shares/$code'
+    | '/api/public/shares/create'
+    | '/api/public/shares/$code/deactivate'
+    | '/api/public/shares/$code/heartbeat'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/api/public/consume/$code'
+    | '/api/public/cron/cleanup'
+    | '/api/public/download/$code'
+    | '/api/public/shares/$code'
+    | '/api/public/shares/create'
+    | '/api/public/shares/$code/deactivate'
+    | '/api/public/shares/$code/heartbeat'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/public/consume/$code'
+    | '/api/public/cron/cleanup'
+    | '/api/public/download/$code'
+    | '/api/public/shares/$code'
+    | '/api/public/shares/create'
+    | '/api/public/shares/$code/deactivate'
+    | '/api/public/shares/$code/heartbeat'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicConsumeCodeRoute: typeof ApiPublicConsumeCodeRoute
+  ApiPublicCronCleanupRoute: typeof ApiPublicCronCleanupRoute
+  ApiPublicDownloadCodeRoute: typeof ApiPublicDownloadCodeRoute
+  ApiPublicSharesCodeRoute: typeof ApiPublicSharesCodeRouteWithChildren
+  ApiPublicSharesCreateRoute: typeof ApiPublicSharesCreateRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +143,78 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/shares/create': {
+      id: '/api/public/shares/create'
+      path: '/api/public/shares/create'
+      fullPath: '/api/public/shares/create'
+      preLoaderRoute: typeof ApiPublicSharesCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shares/$code': {
+      id: '/api/public/shares/$code'
+      path: '/api/public/shares/$code'
+      fullPath: '/api/public/shares/$code'
+      preLoaderRoute: typeof ApiPublicSharesCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/download/$code': {
+      id: '/api/public/download/$code'
+      path: '/api/public/download/$code'
+      fullPath: '/api/public/download/$code'
+      preLoaderRoute: typeof ApiPublicDownloadCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/cron/cleanup': {
+      id: '/api/public/cron/cleanup'
+      path: '/api/public/cron/cleanup'
+      fullPath: '/api/public/cron/cleanup'
+      preLoaderRoute: typeof ApiPublicCronCleanupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/consume/$code': {
+      id: '/api/public/consume/$code'
+      path: '/api/public/consume/$code'
+      fullPath: '/api/public/consume/$code'
+      preLoaderRoute: typeof ApiPublicConsumeCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/shares/$code/heartbeat': {
+      id: '/api/public/shares/$code/heartbeat'
+      path: '/heartbeat'
+      fullPath: '/api/public/shares/$code/heartbeat'
+      preLoaderRoute: typeof ApiPublicSharesCodeHeartbeatRouteImport
+      parentRoute: typeof ApiPublicSharesCodeRoute
+    }
+    '/api/public/shares/$code/deactivate': {
+      id: '/api/public/shares/$code/deactivate'
+      path: '/deactivate'
+      fullPath: '/api/public/shares/$code/deactivate'
+      preLoaderRoute: typeof ApiPublicSharesCodeDeactivateRouteImport
+      parentRoute: typeof ApiPublicSharesCodeRoute
+    }
   }
 }
 
+interface ApiPublicSharesCodeRouteChildren {
+  ApiPublicSharesCodeDeactivateRoute: typeof ApiPublicSharesCodeDeactivateRoute
+  ApiPublicSharesCodeHeartbeatRoute: typeof ApiPublicSharesCodeHeartbeatRoute
+}
+
+const ApiPublicSharesCodeRouteChildren: ApiPublicSharesCodeRouteChildren = {
+  ApiPublicSharesCodeDeactivateRoute: ApiPublicSharesCodeDeactivateRoute,
+  ApiPublicSharesCodeHeartbeatRoute: ApiPublicSharesCodeHeartbeatRoute,
+}
+
+const ApiPublicSharesCodeRouteWithChildren =
+  ApiPublicSharesCodeRoute._addFileChildren(ApiPublicSharesCodeRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicConsumeCodeRoute: ApiPublicConsumeCodeRoute,
+  ApiPublicCronCleanupRoute: ApiPublicCronCleanupRoute,
+  ApiPublicDownloadCodeRoute: ApiPublicDownloadCodeRoute,
+  ApiPublicSharesCodeRoute: ApiPublicSharesCodeRouteWithChildren,
+  ApiPublicSharesCreateRoute: ApiPublicSharesCreateRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

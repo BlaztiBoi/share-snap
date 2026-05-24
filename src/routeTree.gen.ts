@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SendRouteImport } from './routes/send'
 import { Route as ReceiveRouteImport } from './routes/receive'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReceiveCodeRouteImport } from './routes/receive_.$code'
 import { Route as ApiPublicSharesCreateRouteImport } from './routes/api/public/shares.create'
@@ -32,6 +33,11 @@ const SendRoute = SendRouteImport.update({
 const ReceiveRoute = ReceiveRouteImport.update({
   id: '/receive',
   path: '/receive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -99,6 +105,7 @@ const ApiPublicSharesCodeDeactivateRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/receive': typeof ReceiveRoute
   '/send': typeof SendRoute
   '/receive/$code': typeof ReceiveCodeRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/receive': typeof ReceiveRoute
   '/send': typeof SendRoute
   '/receive/$code': typeof ReceiveCodeRoute
@@ -132,6 +140,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/receive': typeof ReceiveRoute
   '/send': typeof SendRoute
   '/receive_/$code': typeof ReceiveCodeRoute
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/receive'
     | '/send'
     | '/receive/$code'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/receive'
     | '/send'
     | '/receive/$code'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/receive'
     | '/send'
     | '/receive_/$code'
@@ -199,6 +211,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   ReceiveRoute: typeof ReceiveRoute
   SendRoute: typeof SendRoute
   ReceiveCodeRoute: typeof ReceiveCodeRoute
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/receive'
       fullPath: '/receive'
       preLoaderRoute: typeof ReceiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -330,6 +350,7 @@ const ApiPublicSharesCodeRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   ReceiveRoute: ReceiveRoute,
   SendRoute: SendRoute,
   ReceiveCodeRoute: ReceiveCodeRoute,

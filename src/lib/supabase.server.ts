@@ -5,12 +5,14 @@ import { createClient } from "@supabase/supabase-js";
  * Never import this from client/component code.
  */
 function getSupabaseAdmin() {
-  const url = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = process.env.PRIVATE_SUPABASE_URL ?? process.env.SUPABASE_URL;
+  const serviceKey =
+    process.env.PRIVATE_SUPABASE_SERVICE_ROLE_KEY ??
+    process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !serviceKey) {
     throw new Error(
-      "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables. See envReadme.md.",
+      "Missing PRIVATE_SUPABASE_URL or PRIVATE_SUPABASE_SERVICE_ROLE_KEY environment variables. See envReadme.md.",
     );
   }
 

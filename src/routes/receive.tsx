@@ -31,7 +31,7 @@ function ReceivePage() {
         </p>
       </div>
 
-      <form onSubmit={submit} className="mt-8 glass rounded-2xl p-6">
+      <form onSubmit={submit} className="mt-8 glass rounded-xl p-6">
         <input
           inputMode="numeric"
           pattern="\d{4}"
@@ -40,7 +40,7 @@ function ReceivePage() {
           value={code}
           onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 4))}
           placeholder="0000"
-          className="w-full rounded-md border border-border bg-background/60 px-4 py-4 text-center font-mono text-4xl tracking-[0.5em] outline-none focus:border-neon focus:ring-1 focus:ring-neon"
+          className="w-full rounded-md border border-border bg-background/60 px-4 py-4 text-center font-mono text-4xl tracking-[0.5em] outline-none focus:border-primary focus:ring-1 focus:ring-primary"
         />
         <button
           type="submit"

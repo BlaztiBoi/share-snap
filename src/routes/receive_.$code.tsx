@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { CopyButton } from "@/components/CopyButton";
 import { formatBytes } from "@/lib/format";
 
-export const Route = createFileRoute("/receive/$code")({
+export const Route = createFileRoute("/receive_/$code")({
   head: ({ params }) => ({
     meta: [
       { title: `Receive ${params.code} — Blazt Share` },

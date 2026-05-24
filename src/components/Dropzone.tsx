@@ -21,7 +21,9 @@ export function Dropzone({
       const merged = [...files, ...incoming].slice(0, maxFiles);
       const total = merged.reduce((s, f) => s + f.size, 0);
       if (total > maxTotalBytes) {
-        alert(`Total size exceeds ${(maxTotalBytes / (1024 * 1024)).toFixed(0)} MB`);
+        alert(
+          `Total size exceeds ${(maxTotalBytes / (1024 * 1024)).toFixed(0)} MB`,
+        );
         return;
       }
       onFiles(merged);
@@ -59,13 +61,15 @@ export function Dropzone({
         className={
           "relative flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-8 text-center transition-all " +
           (dragOver
-            ? "border-primary bg-primary/5"
+            ? "border-neon bg-neon/5 shadow-[0_0_40px_-10px_var(--neon)]"
             : "border-border hover:border-primary/60 hover:bg-secondary/40")
         }
       >
         <UploadCloud className="h-8 w-8 text-neon" />
         <div>
-          <p className="text-sm font-medium">Drop files or click to upload</p>
+          <p className="text-sm font-medium">
+            Drop files or click to upload
+          </p>
           <p className="text-xs text-muted-foreground mt-1">
             Up to {maxFiles} files · {(maxTotalBytes / (1024 * 1024)).toFixed(0)} MB total
           </p>
@@ -85,11 +89,16 @@ export function Dropzone({
       {files.length > 0 && (
         <div className="rounded-lg border border-border bg-secondary/30 divide-y divide-border/50">
           {files.map((f, i) => (
-            <div key={`${f.name}-${i}`} className="flex items-center gap-3 px-4 py-2.5">
+            <div
+              key={`${f.name}-${i}`}
+              className="flex items-center gap-3 px-4 py-2.5"
+            >
               <FileIcon className="h-4 w-4 text-neon shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{f.name}</p>
-                <p className="text-[11px] text-muted-foreground">{formatBytes(f.size)}</p>
+                <p className="text-[11px] text-muted-foreground">
+                  {formatBytes(f.size)}
+                </p>
               </div>
               <button
                 type="button"
@@ -102,12 +111,8 @@ export function Dropzone({
             </div>
           ))}
           <div className="flex items-center justify-between px-4 py-2 text-[11px] text-muted-foreground bg-background/40">
-            <span>
-              {files.length} file{files.length !== 1 ? "s" : ""}
-            </span>
-            <span className="font-mono">
-              {formatBytes(total)} / {(maxTotalBytes / (1024 * 1024)).toFixed(0)} MB
-            </span>
+            <span>{files.length} file{files.length !== 1 ? "s" : ""}</span>
+            <span className="font-mono">{formatBytes(total)} / {(maxTotalBytes / (1024 * 1024)).toFixed(0)} MB</span>
           </div>
         </div>
       )}

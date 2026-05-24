@@ -11,7 +11,7 @@ import { useCountdown } from "@/hooks/useCountdown";
 export const Route = createFileRoute("/send")({
   head: () => ({
     meta: [
-      { title: "Send - Blazt Share" },
+      { title: "Send — Blazt Share" },
       {
         name: "description",
         content: "Upload files or paste text to generate a 4-digit share code.",
@@ -23,11 +23,7 @@ export const Route = createFileRoute("/send")({
 
 type Mode = "text" | "file";
 
-type PublicCfg = {
-  max_files: number;
-  max_total_bytes: number;
-  share_ttl_minutes: number;
-};
+type PublicCfg = { max_files: number; max_total_bytes: number; share_ttl_minutes: number };
 
 function SendPage() {
   const [mode, setMode] = useState<Mode>("text");
@@ -37,6 +33,7 @@ function SendPage() {
   const [submitting, setSubmitting] = useState(false);
   const [code, setCode] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  // Sensible client defaults; server is the source of truth.
   const [cfg] = useState<PublicCfg>({
     max_files: 10,
     max_total_bytes: 100 * 1024 * 1024,
@@ -83,7 +80,9 @@ function SendPage() {
         return;
       }
       setCode(data.code);
-      setExpiresAt(new Date(Date.now() + cfg.share_ttl_minutes * 60 * 1000).toISOString());
+      setExpiresAt(
+        new Date(Date.now() + cfg.share_ttl_minutes * 60 * 1000).toISOString(),
+      );
     } catch {
       toast.error("Network error");
     } finally {
@@ -99,9 +98,7 @@ function SendPage() {
         method: "POST",
         keepalive: true,
       });
-    } catch {
-      toast.error("Could not reach the server");
-    }
+    } catch {}
     toast.success("Share deleted");
     reset();
   };
@@ -126,18 +123,21 @@ function SendPage() {
       typeof window !== "undefined"
         ? `${window.location.origin}/receive/${code}`
         : `/receive/${code}`;
-
     return (
       <div className="mx-auto max-w-2xl px-4 py-12">
-        <div className="glass rounded-xl p-8 text-center">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Share code</p>
-          <div className="mt-4 font-mono text-7xl font-bold tracking-[0.15em] text-foreground sm:text-8xl">
+        <div className="glass rounded-2xl p-8 text-center relative overflow-hidden">
+          <div className="absolute inset-x-0 -top-32 h-64 bg-neon/10 blur-3xl pointer-events-none" />
+          <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground">
+            Share code · live
+          </p>
+          <div className="mt-4 font-mono text-7xl sm:text-8xl font-bold tracking-[0.15em] neon-text relative">
             {code}
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
-            Expires in <span className="font-mono text-foreground">{countdown.text}</span>
-            <span className="mx-2">-</span>
-            <span>keep this tab open</span>
+            Expires in{" "}
+            <span className="font-mono text-foreground">{countdown.text}</span>
+            <span className="mx-2">·</span>
+            <span className="text-neon">keep this tab open</span>
           </p>
 
           <div className="mt-8 flex justify-center">
@@ -149,7 +149,9 @@ function SendPage() {
             <CopyButton value={shareUrl} label="Copy link" />
           </div>
 
-          <p className="mt-6 break-all text-xs text-muted-foreground">{shareUrl}</p>
+          <p className="mt-6 text-xs text-muted-foreground break-all">
+            {shareUrl}
+          </p>
 
           <div className="mt-8 flex flex-wrap justify-center gap-2">
             <button
@@ -175,7 +177,9 @@ function SendPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
-      <h1 className="text-3xl font-bold">Send</h1>
+      <h1 className="text-3xl font-bold">
+        Send <span className="neon-text">·</span>
+      </h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Paste text or drop files. You'll get a 4-digit code.
       </p>
@@ -184,7 +188,7 @@ function SendPage() {
         <button
           onClick={() => setMode("text")}
           className={
-            "rounded-md px-4 py-1.5 text-sm transition-colors " +
+            "px-4 py-1.5 text-sm rounded-md transition-colors " +
             (mode === "text" ? "bg-primary text-primary-foreground" : "")
           }
         >
@@ -193,7 +197,7 @@ function SendPage() {
         <button
           onClick={() => setMode("file")}
           className={
-            "rounded-md px-4 py-1.5 text-sm transition-colors " +
+            "px-4 py-1.5 text-sm rounded-md transition-colors " +
             (mode === "file" ? "bg-primary text-primary-foreground" : "")
           }
         >
@@ -201,15 +205,15 @@ function SendPage() {
         </button>
       </div>
 
-      <div className="mt-6 glass rounded-xl p-6">
+      <div className="mt-6 glass rounded-2xl p-6">
         {mode === "text" ? (
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Paste or type anything..."
+            placeholder="Paste or type anything…"
             rows={8}
             maxLength={200_000}
-            className="w-full resize-y rounded-md border border-border bg-background/60 p-3 font-mono text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            className="w-full resize-y rounded-md border border-border bg-background/60 p-3 text-sm font-mono outline-none focus:border-neon focus:ring-1 focus:ring-neon"
           />
         ) : (
           <Dropzone
@@ -220,12 +224,12 @@ function SendPage() {
           />
         )}
 
-        <label className="mt-5 flex cursor-pointer select-none items-center gap-2 text-sm">
+        <label className="mt-5 flex items-center gap-2 text-sm cursor-pointer select-none">
           <input
             type="checkbox"
             checked={oneTime}
             onChange={(e) => setOneTime(e.target.checked)}
-            className="h-4 w-4 rounded border-border bg-secondary accent-[color:var(--primary)]"
+            className="h-4 w-4 rounded border-border bg-secondary accent-[color:var(--neon)]"
           />
           Delete after first download
         </label>
@@ -234,10 +238,14 @@ function SendPage() {
           type="button"
           disabled={submitting}
           onClick={submit}
-          className="neon-button mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md px-5 py-3 text-sm font-semibold disabled:opacity-50"
+          className="mt-6 inline-flex w-full items-center justify-center gap-2 neon-button rounded-md px-5 py-3 text-sm font-semibold disabled:opacity-50"
         >
-          {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          {submitting ? "Creating share..." : "Generate code"}
+          {submitting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="h-4 w-4" />
+          )}
+          {submitting ? "Creating share…" : "Generate code"}
         </button>
       </div>
     </div>

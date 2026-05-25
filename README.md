@@ -7,7 +7,7 @@ closes their tab.
 
 ## Features
 
-- 📄 Share **text** or any **file up to 25 MB** (images, video, PDF, ZIP, …)
+- 📄 Share **text** or files (up to **100 MB** total locally; **4 MB** on Vercel — see [Deploy to Vercel](#deploy-to-vercel))
 - 🔢 Random **4-digit code** + shareable **QR code**
 - 👀 **Presence detection** — sender sends a heartbeat every 20 s; if it goes
   away the share becomes inaccessible
@@ -16,9 +16,26 @@ closes their tab.
 - 🔐 Private storage with **signed URLs** (60 s TTL)
 - 🧹 Lazy cleanup + optional pg_cron job
 
+## Deploy to Vercel
+
+1. Import the repo in [Vercel](https://vercel.com/new).
+2. Framework preset: **Other** (or TanStack Start if offered). Build command: `npm run build`. Output directory: leave default — Nitro writes the Vercel Build Output API layout automatically.
+3. Add environment variables (Production + Preview):
+
+   | Variable | Notes |
+   | -------- | ----- |
+   | `VITE_SUPABASE_URL` | Supabase project URL |
+   | `VITE_SUPABASE_PUBLISHABLE_KEY` | anon / publishable key |
+   | `SUPABASE_URL` | Same as above |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Server-only; never expose to the client |
+
+4. Deploy. Optional: set `CRON_SECRET` in Vercel if you want to lock down `/api/public/cron/cleanup` (see [Vercel cron docs](https://vercel.com/docs/cron-jobs)).
+
+`vercel.json` includes an hourly cron hitting the cleanup route. File uploads are capped at **4 MB** total on Vercel (platform request-body limit is 4.5 MB).
+
 ## Tech
 
-- TanStack Start (React 19 + Vite, SSR on Cloudflare Workers)
+- TanStack Start (React 19 + Vite, SSR via Nitro on Vercel)
 - TypeScript + Tailwind CSS v4
 - Supabase (Postgres + Storage)
 - `qrcode` for QR generation
@@ -69,7 +86,7 @@ clients never talk to Supabase directly.
 
 - Service role key is **server-only** (`process.env.SUPABASE_SERVICE_ROLE_KEY`),
   loaded inside route handlers, never in components or loaders.
-- File size (25 MB) and MIME type are validated server-side.
+- File size and MIME type are validated server-side (limit depends on host; 4 MB on Vercel).
 - Storage bucket is private; downloads go through 60-second signed URLs.
 - 4-digit codes are short — but a code is only valid while the share is
   active + non-expired (≤ 30 min). Brute-force surface is small.

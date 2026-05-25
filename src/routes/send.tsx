@@ -39,7 +39,7 @@ function SendPage() {
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [cfg] = useState<PublicCfg>({
     max_files: 10,
-    max_total_bytes: 100 * 1024 * 1024,
+    max_total_bytes: Number(import.meta.env.VITE_MAX_TOTAL_BYTES) || 100 * 1024 * 1024,
     share_ttl_minutes: 30,
   });
 

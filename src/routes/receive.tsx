@@ -3,6 +3,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/receive")({
+  loader: () => void 0,
+  pendingMs: 0,
   head: () => ({
     meta: [
       { title: "Receive — Blazt Share" },

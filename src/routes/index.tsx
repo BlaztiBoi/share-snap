@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Download, Send } from "lucide-react";
+import { NavigatingLink } from "@/components/NavigatingLink";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -29,7 +30,11 @@ function Home() {
       </div>
 
       <div className="mt-12 grid gap-4 sm:grid-cols-2">
-        <Link to="/send" className="glass rounded-xl p-7 transition-colors hover:border-primary/60">
+        <NavigatingLink
+          to="/send"
+          loadingLabel="Opening Send…"
+          className="glass block min-h-[11rem] rounded-xl p-7 transition-colors hover:border-primary/60"
+        >
           <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-neon neon-border">
             <Send className="h-6 w-6" />
           </div>
@@ -37,11 +42,12 @@ function Home() {
           <p className="mt-2 text-sm text-muted-foreground">
             Upload files up to 100 MB total or paste text. Generate a shareable code instantly.
           </p>
-        </Link>
+        </NavigatingLink>
 
-        <Link
+        <NavigatingLink
           to="/receive"
-          className="glass rounded-xl p-7 transition-colors hover:border-primary/60"
+          loadingLabel="Opening Receive…"
+          className="glass block min-h-[11rem] rounded-xl p-7 transition-colors hover:border-primary/60"
         >
           <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-neon neon-border">
             <Download className="h-6 w-6" />
@@ -50,7 +56,7 @@ function Home() {
           <p className="mt-2 text-sm text-muted-foreground">
             Enter a code and download the shared file or text from any device.
           </p>
-        </Link>
+        </NavigatingLink>
       </div>
     </div>
   );

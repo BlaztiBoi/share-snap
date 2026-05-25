@@ -9,6 +9,8 @@ import { useHeartbeat } from "@/hooks/useHeartbeat";
 import { useCountdown } from "@/hooks/useCountdown";
 
 export const Route = createFileRoute("/send")({
+  loader: () => void 0,
+  pendingMs: 0,
   head: () => ({
     meta: [
       { title: "Send - Blazt Share" },

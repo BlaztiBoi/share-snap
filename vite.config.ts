@@ -13,13 +13,31 @@ export default defineConfig({
   cloudflare: false,
   tanstackStart: {
     server: { entry: "server" },
+    // Per-route lazy chunks 404 after deploy when HTML/JS versions mismatch — bundle routes together.
+    router: {
+      autoCodeSplitting: false,
+    },
   },
   plugins: [
     nitro({
       preset: "vercel",
+      vercel: {
+        skewProtection: true,
+      },
     }),
   ],
   vite: {
+    environments: {
+      client: {
+        build: {
+          rollupOptions: {
+            output: {
+              inlineDynamicImports: true,
+            },
+          },
+        },
+      },
+    },
     define: {
       // Vercel sets VERCEL=1 at build time; cap client upload UI to match server limit.
       "import.meta.env.VITE_MAX_TOTAL_BYTES": JSON.stringify(

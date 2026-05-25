@@ -11,7 +11,6 @@ import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { Header } from "@/components/Header";
-import { NavigationOverlay } from "@/components/NavigationOverlay";
 
 function NotFoundComponent() {
   return (
@@ -68,7 +67,6 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  loader: () => void 0,
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -116,7 +114,6 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Header />
-      <NavigationOverlay />
       <main className="relative z-10">
         <Outlet />
       </main>

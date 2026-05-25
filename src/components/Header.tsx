@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { Zap } from "lucide-react";
-import { NavigatingLink } from "@/components/NavigatingLink";
 
 export function Header() {
   return (
@@ -15,22 +14,20 @@ export function Header() {
           </span>
         </Link>
         <nav className="flex items-center gap-1 text-sm">
-          <NavigatingLink
+          <Link
             to="/send"
-            loadingLabel="Send"
-            className="min-w-[4.5rem] px-3 py-1.5 rounded-md hover:bg-accent transition-colors"
+            className="px-3 py-1.5 rounded-md hover:bg-accent transition-colors"
             activeProps={{ className: "text-foreground bg-accent" }}
           >
             Send
-          </NavigatingLink>
-          <NavigatingLink
+          </Link>
+          <Link
             to="/receive"
-            loadingLabel="Receive"
-            className="min-w-[5.5rem] px-3 py-1.5 rounded-md hover:bg-accent transition-colors"
+            className="px-3 py-1.5 rounded-md hover:bg-accent transition-colors"
             activeProps={{ className: "text-foreground bg-accent" }}
           >
             Receive
-          </NavigatingLink>
+          </Link>
         </nav>
       </div>
     </header>
